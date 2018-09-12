@@ -13,13 +13,13 @@ Ring BUffer in C. Performance aspects were privileged over safety, for we don't 
 
 # Using RingBuffer in C
 
-You need to add the sources locate at **src/** in your project. This implementation is well suited for embedded systems.
+You need to add the sources located at **src/** into your project's search path. This implementation is well suited for embedded systems.
 
 # Build Tests
 
-The Makefile in the directory **tests/** builds the plain-c ring-buffer Unit Tests. 
+Use **ceedling test:all** to run unit tests.
 
 Dependecies:
 
-   * [libcheck](https://libcheck.github.io/check/)
+   * [Ceedling](https://github.com/ThrowTheSwitch/Ceedling)
 
