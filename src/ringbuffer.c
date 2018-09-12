@@ -1,10 +1,6 @@
 #include "ringbuffer.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-int ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len) {
+int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*user_memcpy)(void *str1, const void *str2, size_t n)) {
    if(!(len && !(len & (len - 1)))) {
       return 0;
    }
@@ -13,6 +9,7 @@ int ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len) {
    buffer->head = 0;
    buffer->sizeMask = len-1;
    buffer->data = data;
+   buffer->user_memcpy = user_memcpy;
    return 1;
 }
 
@@ -45,11 +42,11 @@ void ringBufferAppendMultiple(RingBuffer *buffer, uint8_t *data, uint32_t len){
    if(buffer->tail + len > buffer->sizeMask) {
       uint32_t lenToTheEnd = buffer->sizeMask - buffer->tail + 1;
       uint32_t lenFromBegin = len - lenToTheEnd;
-      memcpy(buffer->data + buffer->tail, data, lenToTheEnd);
-      memcpy(buffer->data, data + lenToTheEnd, lenFromBegin);
+      buffer->user_memcpy(buffer->data + buffer->tail, data, lenToTheEnd);
+      buffer->user_memcpy(buffer->data, data + lenToTheEnd, lenFromBegin);
    }
    else {
-      memcpy(buffer->data, data, len);
+      buffer->user_memcpy(buffer->data, data, len);
    }
    buffer->tail = (buffer->tail + len) & buffer->sizeMask;
 }
@@ -73,11 +70,11 @@ void ringBufferPeakMultiple(RingBuffer *buffer, uint8_t *dst, uint32_t len){
    if(buffer->head + len > buffer->sizeMask) {
       uint32_t lenToTheEnd = buffer->sizeMask - buffer->head + 1;
       uint32_t lenFromBegin = len - lenToTheEnd;
-      memcpy(dst, buffer->data + buffer->head, lenToTheEnd);
-      memcpy(dst + lenToTheEnd, buffer->data, lenFromBegin);
+      buffer->user_memcpy(dst, buffer->data + buffer->head, lenToTheEnd);
+      buffer->user_memcpy(dst + lenToTheEnd, buffer->data, lenFromBegin);
    }
    else {
-      memcpy(dst, buffer->data, len);
+      buffer->user_memcpy(dst, buffer->data, len);
    }
 }
 

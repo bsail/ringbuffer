@@ -2,7 +2,7 @@
 #define __RING_BUFFER_H_
 
 #include <stdint.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef  __cplusplus
 extern  "C" {
@@ -13,9 +13,12 @@ typedef struct {
    uint32_t head;
    uint32_t sizeMask;
    uint8_t *data;
+   // void (*buffer_lock)(void);
+   // void (*buffer_unlock)(void);
+   void *(*user_memcpy)(void *str1, const void *str2, size_t n);
 }RingBuffer;
 
-int ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len);
+int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*user_memcpy)(void *str1, const void *str2, size_t n));
 
 uint32_t ringBufferLen(RingBuffer *buffer);
 uint8_t ringBufferEmpty(RingBuffer *buffer);

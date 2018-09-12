@@ -1,5 +1,6 @@
 #include "unity.h"
 #include "ringbuffer.h"
+#include <string.h>
 
 #define BUFFER_SIZE 128
 
@@ -17,7 +18,7 @@ void test_Append_Element_No_Round()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    for(uint8_t i=0; i<BUFFER_SIZE; i++) {
         elements[i] = i;
@@ -43,7 +44,7 @@ void test_Append_Element_Head_In_The_middle()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    /* Simulate Insertions and removals */
    buffer.tail = buffer.head = BUFFER_SIZE/2;
@@ -76,7 +77,7 @@ void test_Append_Multiple_Elements_No_Round()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
         elements[i] = i;
@@ -100,7 +101,7 @@ void test_Append_Multiple_Elements_Head_In_The_middle()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    /* Simulate Insertions and removals */
    buffer.tail = buffer.head = BUFFER_SIZE/2;
