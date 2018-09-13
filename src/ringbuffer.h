@@ -13,11 +13,11 @@ typedef struct {
    uint32_t head;
    uint32_t sizeMask;
    uint8_t *data;
+   void *(*user_memcpy)(void *str1, const void *str2, size_t n);
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
    void (*buffer_lock)(void);
    void (*buffer_unlock)(void);
 #endif
-   void *(*user_memcpy)(void *str1, const void *str2, size_t n);
 }RingBuffer;
 
 int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*user_memcpy)(void *str1, const void *str2, size_t n)
