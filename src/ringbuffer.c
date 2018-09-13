@@ -5,40 +5,50 @@ int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*u
    , void (*buffer_lock)(void), void (*buffer_unlock)(void)
 #endif
    ) {
+   int8_t ret;
    if(!(len && !(len & (len - 1)))) {
-      return 0;
-   }
-
-   buffer->tail = 0;
-   buffer->head = 0;
-   buffer->sizeMask = len-1;
-   buffer->data = data;
-   buffer->user_memcpy = user_memcpy;
+      ret = 0;
+   } else {
+      buffer->tail = 0;
+      buffer->head = 0;
+      buffer->sizeMask = len-1;
+      buffer->data = data;
+      buffer->user_memcpy = user_memcpy;
 #ifndef RINGBUFFER_EXCLUDE_LOCKING   
-   buffer->buffer_lock = buffer_lock;
-   buffer->buffer_unlock = buffer_unlock;
+      buffer->buffer_lock = buffer_lock;
+      buffer->buffer_unlock = buffer_unlock;
 #endif
-   return 1;
+      ret = 1;
+   }
+   return ret;
 }
 
 uint32_t ringBufferLen(RingBuffer *buffer) {
+   uint32_t ret;
    if(buffer->tail >= buffer->head) {
-      return buffer->tail-buffer->head;
+      ret = buffer->tail-buffer->head;
+   } else {
+      ret = buffer->sizeMask-(buffer->head-buffer->tail)+1;
    }
-
-   return buffer->sizeMask-(buffer->head-buffer->tail)+1;
+   return ret;
 }
 
 uint8_t ringBufferEmpty(RingBuffer *buffer) {
-   return (buffer->tail == buffer->head);
+   uint8_t ret;
+   ret = (buffer->tail == buffer->head);
+   return ret;
 }
 
 uint32_t ringBufferLenAvailable(RingBuffer *buffer){
-   return buffer->sizeMask - ringBufferLen(buffer);
+   uint32_t ret;
+   ret = buffer->sizeMask - ringBufferLen(buffer);
+   return ret;
 }
 
 uint32_t ringBufferMaxSize(RingBuffer *buffer) {
-   return buffer->sizeMask;
+   uint32_t ret;
+   ret = buffer->sizeMask;
+   return ret;
 }
 
 void ringBufferAppendOne(RingBuffer *buffer, uint8_t data){
@@ -60,7 +70,9 @@ void ringBufferAppendMultiple(RingBuffer *buffer, uint8_t *data, uint32_t len){
 }
 
 uint8_t ringBufferPeakOne(RingBuffer *buffer){
-   return buffer->data[buffer->head];
+   uint8_t ret;
+   ret = buffer->data[buffer->head];
+   return ret;
 }
 
 uint8_t ringBufferGetOne(RingBuffer *buffer){
