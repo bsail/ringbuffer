@@ -54,3 +54,5 @@ dkms.conf
 # Ceedling utils
 vendor/**
 build/**
+coverage.info
+Gemfile.lock

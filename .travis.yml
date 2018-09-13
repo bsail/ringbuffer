@@ -1,0 +1,13 @@
+language: ruby
+before_install:
+  - sudo apt-get install lcov
+  - gem install ceedling
+install:
+  - mkdir build
+  - bundler install
+script:
+  - cd .. && ceedling update ringbuffer && cd -
+  - bundler exec rake travis
+after_success:
+  - coveralls-lcov coverage.info
+

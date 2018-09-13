@@ -46,13 +46,47 @@
     - *common_defines
     - TEST
 
+:flags:
+  :test:
+    :compile:
+      :ringbuffer:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :'test_.+':       # add '--O1' to compilation of main.c as part of test builds including main.c
+        - -std=c99
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+  :gcov:
+    :compile:
+    :compile:
+      :ringbuffer:
+        - -std=c89
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+      :'test_.+':       # add '--O1' to compilation of main.c as part of test builds including main.c
+        - -std=c99
+        - -Wall
+        - -Wextra
+        - -pedantic
+        - -Werror
+
 :cmock:
   :mock_prefix: mock_
   :when_no_prototypes: :warn
   :enforce_strict_ordering: TRUE
   :plugins:
     - :ignore
+    - :ignore_arg
+    - :array
     - :callback
+    - :return_thru_ptr
   :treat_as:
     uint8:    HEX8
     uint16:   HEX16
@@ -87,4 +121,5 @@
   :enabled:
     - stdout_pretty_tests_report
     - module_generator
+    - gcov
 ...
