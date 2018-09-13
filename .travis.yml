@@ -6,7 +6,7 @@ install:
   - mkdir build
   - bundler install
 script:
-  - cd .. && ceedling update ringbuffer && cd -
+  - ceedling upgrade .
   - bundler exec rake travis
 after_success:
   - coveralls-lcov coverage.info
