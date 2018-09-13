@@ -13,12 +13,12 @@ typedef struct {
    uint32_t head;
    uint32_t sizeMask;
    uint8_t *data;
-   /* void (*buffer_lock)(void); */
-   /* void (*buffer_unlock)(void); */
+   void (*buffer_lock)(void);
+   void (*buffer_unlock)(void);
    void *(*user_memcpy)(void *str1, const void *str2, size_t n);
 }RingBuffer;
 
-int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*user_memcpy)(void *str1, const void *str2, size_t n));
+int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*user_memcpy)(void *str1, const void *str2, size_t n), void (*buffer_lock)(void), void (*buffer_unlock)(void));
 
 uint32_t ringBufferLen(RingBuffer *buffer);
 uint8_t ringBufferEmpty(RingBuffer *buffer);
