@@ -1,6 +1,10 @@
 #include "ringbuffer.h"
 
-int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*user_memcpy)(void *str1, const void *str2, size_t n), void (*buffer_lock)(void), void (*buffer_unlock)(void)) {
+int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*user_memcpy)(void *str1, const void *str2, size_t n)
+#ifndef RINGBUFFER_EXCLUDE_LOCKING
+   , void (*buffer_lock)(void), void (*buffer_unlock)(void)
+#endif
+   ) {
    if(!(len && !(len & (len - 1)))) {
       return 0;
    }
@@ -10,8 +14,10 @@ int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*u
    buffer->sizeMask = len-1;
    buffer->data = data;
    buffer->user_memcpy = user_memcpy;
+#ifndef RINGBUFFER_EXCLUDE_LOCKING   
    buffer->buffer_lock = buffer_lock;
    buffer->buffer_unlock = buffer_unlock;
+#endif
    return 1;
 }
 

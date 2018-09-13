@@ -1,7 +1,7 @@
 #include "unity.h"
+#define RINGBUFFER_EXCLUDE_LOCKING   1
 #include "ringbuffer.h"
 #include <string.h>
-#include "mock_mutex.h"
 
 #define BUFFER_SIZE 128
 
@@ -19,7 +19,7 @@ void test_Peak_One_After_Multiple_Insertions()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy,lock,unlock), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    for(uint8_t i=0; i<BUFFER_SIZE; i++) {
         elements[i] = i;
@@ -43,7 +43,7 @@ void test_Get_One_After_Multiple_Insertions()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy,lock,unlock), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    for(uint8_t i=0; i<BUFFER_SIZE; i++) {
         elements[i] = i;
@@ -73,7 +73,7 @@ void test_Get_Multiple_After_Multiple_Insertions_No_Round()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy,lock,unlock), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    for(uint8_t i=0; i<BUFFER_SIZE; i++) {
         elements[i] = i;
@@ -107,7 +107,7 @@ void test_Get_Multiple_After_Multiple_Insertions_Round()
    uint8_t data[BUFFER_SIZE] = {0xFF};
    uint8_t elements[BUFFER_SIZE] = {0};
 
-   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy,lock,unlock), 1);
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, BUFFER_SIZE, memcpy), 1);
 
    for(uint8_t i=0; i<BUFFER_SIZE; i++) {
         elements[i] = i;
