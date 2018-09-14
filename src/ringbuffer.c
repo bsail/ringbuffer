@@ -58,7 +58,7 @@ uint32_t ringBufferMaxSize(RingBuffer *buffer) {
 }
 
 void ringBufferAppendOne(RingBuffer *buffer, uint8_t data){
-   buffer->data[buffer->tail] = data;
+   buffer->user_memcpy(&(buffer->data[buffer->tail]),&data,buffer->dataSize);
    buffer->tail = (buffer->tail + 1) & buffer->sizeMask;
 }
 
@@ -66,23 +66,24 @@ void ringBufferAppendMultiple(RingBuffer *buffer, uint8_t *data, uint32_t len){
    if(buffer->tail + len > buffer->sizeMask) {
       uint32_t lenToTheEnd = buffer->sizeMask - buffer->tail + 1;
       uint32_t lenFromBegin = len - lenToTheEnd;
-      buffer->user_memcpy(buffer->data + buffer->tail, data, lenToTheEnd);
-      buffer->user_memcpy(buffer->data, data + lenToTheEnd, lenFromBegin);
+      buffer->user_memcpy(&(buffer->data[buffer->tail]), data, lenToTheEnd*buffer->dataSize);
+      buffer->user_memcpy(buffer->data, &(data[lenToTheEnd]), lenFromBegin*buffer->dataSize);
    }
    else {
-      buffer->user_memcpy(buffer->data, data, len);
+      buffer->user_memcpy(buffer->data, data, len*buffer->dataSize);
    }
    buffer->tail = (buffer->tail + len) & buffer->sizeMask;
 }
 
 uint8_t ringBufferPeakOne(RingBuffer *buffer){
    uint8_t ret;
-   ret = buffer->data[buffer->head];
+   buffer->user_memcpy(&ret,&(buffer->data[buffer->head]),buffer->dataSize);
    return ret;
 }
 
 uint8_t ringBufferGetOne(RingBuffer *buffer){
-   uint8_t data =  buffer->data[buffer->head];
+   uint8_t data;
+   buffer->user_memcpy(&data,&(buffer->data[buffer->head]),buffer->dataSize);
    buffer->head = (buffer->head + 1) & buffer->sizeMask;
    return data;
 }
@@ -96,11 +97,11 @@ void ringBufferPeakMultiple(RingBuffer *buffer, uint8_t *dst, uint32_t len){
    if(buffer->head + len > buffer->sizeMask) {
       uint32_t lenToTheEnd = buffer->sizeMask - buffer->head + 1;
       uint32_t lenFromBegin = len - lenToTheEnd;
-      buffer->user_memcpy(dst, buffer->data + buffer->head, lenToTheEnd);
-      buffer->user_memcpy(dst + lenToTheEnd, buffer->data, lenFromBegin);
+      buffer->user_memcpy(dst, &(buffer->data[buffer->head]), lenToTheEnd*buffer->dataSize);
+      buffer->user_memcpy(&(dst[lenToTheEnd]), buffer->data, lenFromBegin*buffer->dataSize);
    }
    else {
-      buffer->user_memcpy(dst, buffer->data, len);
+      buffer->user_memcpy(dst, buffer->data, len*buffer->dataSize);
    }
 }
 
