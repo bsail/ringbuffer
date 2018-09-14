@@ -30,10 +30,12 @@ void test_Peak_One_After_Multiple_Insertions()
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
         TEST_ASSERT_EQUAL_INT(ringBufferLenAvailable(&buffer), BUFFER_SIZE-i-1);
-        ringBufferAppendOne(&buffer, elements[i]);
+        ringBufferAppendOne(&buffer, &(elements[i]));
         TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), i+1);
         TEST_ASSERT_EQUAL_INT(ringBufferEmpty(&buffer), 0);
-        TEST_ASSERT_EQUAL_INT(ringBufferPeakOne(&buffer), elements[0]);
+        uint8_t temp = 0xFF;
+        ringBufferPeakOne(&buffer,&temp);
+        TEST_ASSERT_EQUAL_INT(temp, elements[0]);
    }
 }
 
@@ -54,14 +56,16 @@ void test_Get_One_After_Multiple_Insertions()
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
         TEST_ASSERT_EQUAL_INT(ringBufferLenAvailable(&buffer), BUFFER_SIZE-i-1);
-        ringBufferAppendOne(&buffer, elements[i]);
+        ringBufferAppendOne(&buffer, &(elements[i]));
         TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), i+1);
         TEST_ASSERT_EQUAL_INT(ringBufferEmpty(&buffer), 0);
    }
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
         TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), BUFFER_SIZE-i-1);
-        TEST_ASSERT_EQUAL_INT(ringBufferGetOne(&buffer), elements[i]);
+        uint8_t temp = 0xFF;
+        ringBufferGetOne(&buffer,&temp);
+        TEST_ASSERT_EQUAL_INT(temp, elements[i]);
    }
 
    TEST_ASSERT_EQUAL_INT(ringBufferEmpty(&buffer), 1);
@@ -84,7 +88,7 @@ void test_Get_Multiple_After_Multiple_Insertions_No_Round()
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
         TEST_ASSERT_EQUAL_INT(ringBufferLenAvailable(&buffer), BUFFER_SIZE-i-1);
-        ringBufferAppendOne(&buffer, elements[i]);
+        ringBufferAppendOne(&buffer, &(elements[i]));
         TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), i+1);
         TEST_ASSERT_EQUAL_INT(ringBufferEmpty(&buffer), 0);
    }

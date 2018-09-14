@@ -28,12 +28,60 @@ void test_Append_Element_No_Round()
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
         TEST_ASSERT_EQUAL_INT(ringBufferLenAvailable(&buffer), BUFFER_SIZE-i-1);
-        ringBufferAppendOne(&buffer, elements[i]);
+        ringBufferAppendOne(&buffer, &(elements[i]));
         TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), i+1);
    }
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
        TEST_ASSERT_EQUAL_INT(data[i], elements[i]);
+   }
+
+}
+
+void test_Append_Element_No_Round_Large_Array()
+{     
+   RingBuffer buffer;
+   uint8_t data[BUFFER_SIZE*2] = {0xFF};
+   uint16_t elements[BUFFER_SIZE] = {0};
+
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, sizeof(data[0])*2, BUFFER_SIZE, memcpy), 1);
+
+   for(uint8_t i=0; i<BUFFER_SIZE; i++) {
+        elements[i] = 0x100+i;
+   }
+
+   for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
+        TEST_ASSERT_EQUAL_INT(ringBufferLenAvailable(&buffer), BUFFER_SIZE-i-1);
+        ringBufferAppendOne(&buffer, (uint8_t*)&(elements[i]));
+        TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), i+1);
+   }
+
+   for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
+       TEST_ASSERT_EQUAL_MEMORY(&(data[2*i]), (uint8_t*)&(elements[i]),2);
+   }
+
+}
+
+void test_Append_Element_No_Round_Very_Large_Array()
+{     
+   RingBuffer buffer;
+   uint8_t data[BUFFER_SIZE*4] = {0xFF};
+   uint32_t elements[BUFFER_SIZE] = {0};
+
+   TEST_ASSERT_EQUAL_INT(ringBufferInit(&buffer, data, sizeof(data[0])*4, BUFFER_SIZE, memcpy), 1);
+
+   for(uint8_t i=0; i<BUFFER_SIZE; i++) {
+        elements[i] = 0x12345678+i;
+   }
+
+   for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
+        TEST_ASSERT_EQUAL_INT(ringBufferLenAvailable(&buffer), BUFFER_SIZE-i-1);
+        ringBufferAppendOne(&buffer, (uint8_t*)&(elements[i]));
+        TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), i+1);
+   }
+
+   for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
+       TEST_ASSERT_EQUAL_MEMORY(&(data[4*i]), (uint8_t*)&(elements[i]),4);
    }
 
 }
@@ -57,7 +105,7 @@ void test_Append_Element_Head_In_The_middle()
 
    for(uint8_t i=0; i<BUFFER_SIZE-1; i++) {
       TEST_ASSERT_EQUAL_INT(ringBufferLenAvailable(&buffer), BUFFER_SIZE-i-1);        
-      ringBufferAppendOne(&buffer, elements[i]);
+      ringBufferAppendOne(&buffer, &(elements[i]));
       TEST_ASSERT_EQUAL_INT(ringBufferLen(&buffer), i+1);
    }
 
