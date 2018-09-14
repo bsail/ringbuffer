@@ -14,7 +14,7 @@ int8_t ringBufferInit(RingBuffer *buffer, uint8_t *data, uint32_t len, void *(*u
       buffer->sizeMask = len-1;
       buffer->data = data;
       buffer->user_memcpy = user_memcpy;
-#ifndef RINGBUFFER_EXCLUDE_LOCKING   
+#ifndef RINGBUFFER_EXCLUDE_LOCKING
       buffer->buffer_lock = buffer_lock;
       buffer->buffer_unlock = buffer_unlock;
 #endif
