@@ -56,3 +56,4 @@ vendor/**
 build/**
 coverage.info
 Gemfile.lock
+ceedling
