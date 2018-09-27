@@ -1,20 +1,5 @@
 #include "ringbuffer.h"
 
-#if !defined(TEST)
-typedef struct {
-	uint32_t tail;
-	uint32_t head;
-	uint32_t sizeMask;
-	uint8_t *data;
-	uint32_t dataSize;
-	void *(*user_memcpy) (void *str1, const void *str2, size_t n);
-#ifndef RINGBUFFER_EXCLUDE_LOCKING
-	void (*buffer_lock) (void);
-	void (*buffer_unlock) (void);
-#endif
-} ringbuffer;
-#endif
-
 int8_t ringbuffer_init(ringbuffer * buffer,
 		       uint8_t * data,
 		       uint32_t dataSize,

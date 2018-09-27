@@ -8,7 +8,6 @@
 extern "C" {
 #endif
 
-#if defined(TEST)
 	typedef struct {
 		uint32_t tail;
 		uint32_t head;
@@ -21,9 +20,6 @@ extern "C" {
 		void (*buffer_unlock) (void);
 #endif
 	} ringbuffer;
-#else
-	typedef struct ringbuffer;
-#endif
 
 	int8_t ringbuffer_init(ringbuffer * buffer,
 			       uint8_t * data,
