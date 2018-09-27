@@ -1,28 +1,29 @@
 #include "ringbuffer.h"
 
 #if !defined(TEST)
-	typedef struct {
-		uint32_t tail;
-		uint32_t head;
-		uint32_t sizeMask;
-		uint8_t *data;
-		uint32_t dataSize;
-		void *(*user_memcpy) (void *str1, const void *str2, size_t n);
+typedef struct {
+	uint32_t tail;
+	uint32_t head;
+	uint32_t sizeMask;
+	uint8_t *data;
+	uint32_t dataSize;
+	void *(*user_memcpy) (void *str1, const void *str2, size_t n);
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
-		void (*buffer_lock) (void);
-		void (*buffer_unlock) (void);
+	void (*buffer_lock) (void);
+	void (*buffer_unlock) (void);
 #endif
-	} RingBuffer;
+} ringbuffer;
 #endif
 
-int8_t ringBufferInit(RingBuffer * buffer,
-		      uint8_t * data,
-		      uint32_t dataSize,
-		      uint32_t len,
-		      void *(*user_memcpy) (void *str1, const void *str2,
-					    size_t n)
+int8_t ringbuffer_init(ringbuffer * buffer,
+		       uint8_t * data,
+		       uint32_t dataSize,
+		       uint32_t len,
+		       void *(*user_memcpy) (void *str1, const void *str2,
+					     size_t n)
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
-		      , void (*buffer_lock) (void), void (*buffer_unlock) (void)
+		       , void (*buffer_lock) (void),
+		       void (*buffer_unlock) (void)
 #endif
     )
 {
@@ -45,7 +46,7 @@ int8_t ringBufferInit(RingBuffer * buffer,
 	return ret;
 }
 
-static uint32_t ringBufferLenInternal(RingBuffer * buffer)
+static uint32_t ringbuffer_lengthInternal(ringbuffer * buffer)
 {
 	uint32_t ret;
 	if (buffer->tail >= buffer->head) {
@@ -56,20 +57,20 @@ static uint32_t ringBufferLenInternal(RingBuffer * buffer)
 	return ret;
 }
 
-uint32_t ringBufferLen(RingBuffer * buffer)
+uint32_t ringbuffer_length(ringbuffer * buffer)
 {
 	uint32_t ret;
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
 #endif
-	ret = ringBufferLenInternal(buffer);
+	ret = ringbuffer_lengthInternal(buffer);
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_unlock();
 #endif
 	return ret;
 }
 
-uint8_t ringBufferEmpty(RingBuffer * buffer)
+uint8_t ringbuffer_is_empty(ringbuffer * buffer)
 {
 	uint8_t ret;
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
@@ -82,20 +83,20 @@ uint8_t ringBufferEmpty(RingBuffer * buffer)
 	return ret;
 }
 
-uint32_t ringBufferLenAvailable(RingBuffer * buffer)
+uint32_t ringbuffer_length_available(ringbuffer * buffer)
 {
 	uint32_t ret;
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
 #endif
-	ret = buffer->sizeMask - ringBufferLenInternal(buffer);
+	ret = buffer->sizeMask - ringbuffer_lengthInternal(buffer);
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_unlock();
 #endif
 	return ret;
 }
 
-uint32_t ringBufferMaxSize(RingBuffer * buffer)
+uint32_t ringbufferMaxSize(ringbuffer * buffer)
 {
 	uint32_t ret;
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
@@ -108,7 +109,7 @@ uint32_t ringBufferMaxSize(RingBuffer * buffer)
 	return ret;
 }
 
-void ringBufferAppendOne(RingBuffer * buffer, uint8_t * data)
+void ringbuffer_append(ringbuffer * buffer, uint8_t * data)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
@@ -121,7 +122,8 @@ void ringBufferAppendOne(RingBuffer * buffer, uint8_t * data)
 #endif
 }
 
-void ringBufferAppendMultiple(RingBuffer * buffer, uint8_t * data, uint32_t len)
+void ringbuffer_append_multiple(ringbuffer * buffer, uint8_t * data,
+				uint32_t len)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
@@ -145,38 +147,38 @@ void ringBufferAppendMultiple(RingBuffer * buffer, uint8_t * data, uint32_t len)
 #endif
 }
 
-static void ringBufferPeakOneInternal(RingBuffer * buffer, uint8_t * data)
+static void ringbuffer_peakInternal(ringbuffer * buffer, uint8_t * data)
 {
 	buffer->user_memcpy(data,
 			    &(buffer->data[buffer->head * buffer->dataSize]),
 			    buffer->dataSize);
 }
 
-void ringBufferPeakOne(RingBuffer * buffer, uint8_t * data)
+void ringbuffer_peak(ringbuffer * buffer, uint8_t * data)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
 #endif
-	ringBufferPeakOneInternal(buffer, data);
+	ringbuffer_peakInternal(buffer, data);
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_unlock();
 #endif
 }
 
-void ringBufferGetOne(RingBuffer * buffer, uint8_t * data)
+void ringbuffer_get(ringbuffer * buffer, uint8_t * data)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
 #endif
-	ringBufferPeakOneInternal(buffer, data);
+	ringbuffer_peakInternal(buffer, data);
 	buffer->head = (buffer->head + 1) & buffer->sizeMask;
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_unlock();
 #endif
 }
 
-static void ringBufferPeakMultipleInternal(RingBuffer * buffer, uint8_t * dst,
-					   uint32_t len)
+static void ringbuffer_peak_multipleInternal(ringbuffer * buffer, uint8_t * dst,
+					     uint32_t len)
 {
 	if (buffer->head + len > buffer->sizeMask) {
 		uint32_t lenToTheEnd = buffer->sizeMask - buffer->head + 1;
@@ -193,30 +195,30 @@ static void ringBufferPeakMultipleInternal(RingBuffer * buffer, uint8_t * dst,
 	}
 }
 
-void ringBufferGetMultiple(RingBuffer * buffer, uint8_t * dst, uint32_t len)
+void ringbuffer_get_multiple(ringbuffer * buffer, uint8_t * dst, uint32_t len)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
 #endif
-	ringBufferPeakMultipleInternal(buffer, dst, len);
+	ringbuffer_peak_multipleInternal(buffer, dst, len);
 	buffer->head = (buffer->head + len) & buffer->sizeMask;
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_unlock();
 #endif
 }
 
-void ringBufferPeakMultiple(RingBuffer * buffer, uint8_t * dst, uint32_t len)
+void ringbuffer_peak_multiple(ringbuffer * buffer, uint8_t * dst, uint32_t len)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
 #endif
-	ringBufferPeakMultipleInternal(buffer, dst, len);
+	ringbuffer_peak_multipleInternal(buffer, dst, len);
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_unlock();
 #endif
 }
 
-void ringBufferDiscardMultiple(RingBuffer * buffer, uint32_t len)
+void ringbuffer_discard_multiple(ringbuffer * buffer, uint32_t len)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();
@@ -227,7 +229,7 @@ void ringBufferDiscardMultiple(RingBuffer * buffer, uint32_t len)
 #endif
 }
 
-void ringBufferClear(RingBuffer * buffer)
+void ringbuffer_clear(ringbuffer * buffer)
 {
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
 	buffer->buffer_lock();

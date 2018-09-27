@@ -20,42 +20,42 @@ extern "C" {
 		void (*buffer_lock) (void);
 		void (*buffer_unlock) (void);
 #endif
-	} RingBuffer;
+	} ringbuffer;
 #else
-	typedef struct RingBuffer;
+	typedef struct ringbuffer;
 #endif
 
-	int8_t ringBufferInit(RingBuffer * buffer,
-			      uint8_t * data,
-			      uint32_t dataSize,
-			      uint32_t len,
-			      void *(*user_memcpy) (void *str1,
-						    const void *str2, size_t n)
+	int8_t ringbuffer_init(ringbuffer * buffer,
+			       uint8_t * data,
+			       uint32_t dataSize,
+			       uint32_t len,
+			       void *(*user_memcpy) (void *str1,
+						     const void *str2, size_t n)
 #ifndef RINGBUFFER_EXCLUDE_LOCKING
-			      , void (*buffer_lock) (void),
-			      void (*buffer_unlock) (void)
+			       , void (*buffer_lock) (void),
+			       void (*buffer_unlock) (void)
 #endif
 	    );
 
-	uint32_t ringBufferLen(RingBuffer * buffer);
-	uint8_t ringBufferEmpty(RingBuffer * buffer);
-	uint32_t ringBufferLenAvailable(RingBuffer * buffer);
-	uint32_t ringBufferMaxSize(RingBuffer * buffer);
+	uint32_t ringbuffer_length(ringbuffer * buffer);
+	uint8_t ringbuffer_is_empty(ringbuffer * buffer);
+	uint32_t ringbuffer_length_available(ringbuffer * buffer);
+	uint32_t ringbufferMaxSize(ringbuffer * buffer);
 
-	void ringBufferAppendOne(RingBuffer * buffer, uint8_t * data);
-	void ringBufferAppendMultiple(RingBuffer * buffer, uint8_t * data,
+	void ringbuffer_append(ringbuffer * buffer, uint8_t * data);
+	void ringbuffer_append_multiple(ringbuffer * buffer, uint8_t * data,
+					uint32_t len);
+
+	void ringbuffer_peak(ringbuffer * buffer, uint8_t * data);
+	void ringbuffer_get(ringbuffer * buffer, uint8_t * data);
+
+	void ringbuffer_get_multiple(ringbuffer * buffer, uint8_t * dst,
+				     uint32_t len);
+	void ringbuffer_peak_multiple(ringbuffer * buffer, uint8_t * dst,
 				      uint32_t len);
 
-	void ringBufferPeakOne(RingBuffer * buffer, uint8_t * data);
-	void ringBufferGetOne(RingBuffer * buffer, uint8_t * data);
-
-	void ringBufferGetMultiple(RingBuffer * buffer, uint8_t * dst,
-				   uint32_t len);
-	void ringBufferPeakMultiple(RingBuffer * buffer, uint8_t * dst,
-				    uint32_t len);
-
-	void ringBufferDiscardMultiple(RingBuffer * buffer, uint32_t len);
-	void ringBufferClear(RingBuffer * buffer);
+	void ringbuffer_discard_multiple(ringbuffer * buffer, uint32_t len);
+	void ringbuffer_clear(ringbuffer * buffer);
 
 #ifdef  __cplusplus
 }
